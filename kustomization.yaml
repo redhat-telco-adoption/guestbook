@@ -1,0 +1,32 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - https://raw.githubusercontent.com/GoogleCloudPlatform/kubernetes-engine-samples/9df8525be9d0e04555c80d50e84e32555a34b470/quickstarts/guestbook/redis-leader-deployment.yaml
+  - https://raw.githubusercontent.com/GoogleCloudPlatform/kubernetes-engine-samples/9df8525be9d0e04555c80d50e84e32555a34b470/quickstarts/guestbook/redis-leader-service.yaml
+  - https://raw.githubusercontent.com/GoogleCloudPlatform/kubernetes-engine-samples/9df8525be9d0e04555c80d50e84e32555a34b470/quickstarts/guestbook/redis-follower-deployment.yaml
+  - https://raw.githubusercontent.com/GoogleCloudPlatform/kubernetes-engine-samples/9df8525be9d0e04555c80d50e84e32555a34b470/quickstarts/guestbook/redis-follower-service.yaml
+  - https://raw.githubusercontent.com/GoogleCloudPlatform/kubernetes-engine-samples/9df8525be9d0e04555c80d50e84e32555a34b470/quickstarts/guestbook/frontend-deployment.yaml
+  - https://raw.githubusercontent.com/GoogleCloudPlatform/kubernetes-engine-samples/9df8525be9d0e04555c80d50e84e32555a34b470/quickstarts/guestbook/frontend-service.yaml
+  - frontend-route.yaml
+
+patches:
+  - patch: |-
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: frontend
+      spec:
+        template:
+          spec:
+            securityContext:
+              sysctls:
+                - name: net.ipv4.ip_unprivileged_port_start
+                  value: "0"
+  - patch: |-
+      apiVersion: v1
+      kind: Service
+      metadata:
+        name: frontend
+      spec:
+        type: ClusterIP
